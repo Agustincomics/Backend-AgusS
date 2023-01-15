@@ -21,8 +21,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/skill")
-@CrossOrigin(origins = "https://front-end-agustinsandoval.web.app")
+
 public class CHys {
     @Autowired
     Shys shys;
@@ -36,7 +37,7 @@ public class CHys {
     @GetMapping("/detail/{id}")
     public ResponseEntity<hys> getById(@PathVariable("id") int id){
         if(!shys.existsById(id)) {
-            return new ResponseEntity(new Mensaje("no existe"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
         }
         hys hYs = shys.getOne(id).get();
         return new ResponseEntity(hYs, HttpStatus.OK);
@@ -54,11 +55,12 @@ public class CHys {
     
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody dtoHys dtohys){
-        if(StringUtils.isBlank(dtohys.getNombre()))
+        if(StringUtils.isBlank(dtohys.getNombre())) {
             return new ResponseEntity(new Mensaje("El nombre es obligatorio"), HttpStatus.BAD_REQUEST);
-        if(shys.existsByNombre(dtohys.getNombre()))
+        }
+        if(shys.existsByNombre(dtohys.getNombre())){
             return new ResponseEntity(new Mensaje("Esa Skill ya existe"), HttpStatus.BAD_REQUEST);
-        
+        }
         hys hYs = new hys(dtohys.getNombre(), dtohys.getPorcentaje());
         shys.save(hYs);
         
@@ -67,15 +69,15 @@ public class CHys {
     
     @PutMapping("/update/{id}")
     public ResponseEntity<?> update(@PathVariable("id") int id, @RequestBody dtoHys dtohys){
-        if(!shys.existsById(id))
+        if(!shys.existsById(id)){
             return new ResponseEntity(new Mensaje("El ID no existe"), HttpStatus.BAD_REQUEST);
-        
-        if(shys.existsByNombre(dtohys.getNombre()) && shys.getByNombre(dtohys.getNombre()).get().getId() != id)
+        }
+        if(shys.existsByNombre(dtohys.getNombre()) && shys.getByNombre(dtohys.getNombre()).get().getId() != id){
             return new ResponseEntity(new Mensaje("Esa Skill ya existe"), HttpStatus.BAD_REQUEST);
-        
-        if(StringUtils.isBlank(dtohys.getNombre()))
+        }
+        if(StringUtils.isBlank(dtohys.getNombre())){
             return new ResponseEntity(new Mensaje("El nombre es obligatorio"), HttpStatus.BAD_REQUEST);
-        
+        }
         hys hYs = shys.getOne(id).get();
         hYs.setNombre(dtohys.getNombre());
         hYs.setPorcentaje(dtohys.getPorcentaje());
